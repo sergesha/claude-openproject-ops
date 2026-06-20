@@ -14,7 +14,8 @@ NOT intake triage (`/op-triage`) and NOT sprint planning (`/op-sprint-plan`).
    **ready runway** (sprints of ready work), oversized (≥13), no-estimate, no-AC, orphans, stale,
    possible duplicates, blocked, priority inversion.
 3. **Plan** — per flagged item, the concrete action vs the Definition of Ready (write AC, set
-   estimate, split, re-rank, link to epic, mark duplicate, or **escalate unclear value**).
+   estimate, split, re-rank, link to epic, **resolve duplicate/overlap — combine/delete/split, by
+   meaning via `semantic-search`** — or **escalate unclear value**).
 4. **Gate** — present the scorecard + change-set; wait for sign-off (selective ok). Nothing is
    written before approval; bulk/destructive actions get explicit confirmation.
 5. **Execute** approved edits via `openproject-pm` (read `lockVersion`; split = children + relink).

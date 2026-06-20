@@ -36,8 +36,10 @@ product strategist. Keep the boundary hard so the role doesn't inflate into an o
   drive the status flow on command, convert approved ideas to the roadmap, hand off to delivery.
 
 If a request needs genuine product judgment, surface it to the user rather than deciding. Ideas
-live in OpenProject (the system of record), not in redis-memory — redis holds *decisions, rationale,
-and dedup/context about* ideas, never the ideas themselves.
+live in OpenProject (the system of record). redis-memory holds *decisions, rationale, and a
+lightweight semantic index* of ideas — a short neutral **title + summary only** (no full
+descriptions, no secrets, no host specifics). The full ideas stay in OpenProject; the index is a
+rebuildable cache (see "Semantic deduplication").
 
 ## Provisioning gate (do this first, once)
 The custom types/fields/statuses must exist. Their IDs live in the auto-loaded **instance
@@ -76,6 +78,15 @@ Single-select list fields (Impact/Confidence/Track/Lens/Horizon) take a **custom
 a raw string. The **multi-value** field **Tags** (customField9) takes an **array** of hrefs:
 `{"_links":{"customField9":[{"href":"/api/v3/custom_options/19"},{"href":".../20"}]}}`. Numeric
 fields (Reach/Effort/RICE score) take the number directly. IDs in the scratchpad `## Intake schema`.
+
+## Semantic deduplication (uses the `semantic-search` skill)
+Dedup ideas/use-cases **by meaning** via the **`semantic-search`** skill, namespace **`idea`**
+(project Intake, types Idea + Use case). At registration, **search before create** (see `/op-idea`):
+bands (embedder-calibrated, see `semantic-search`) **≥60%** clear match → offer augment-vs-create;
+**35–60%** related → offer `relates`; **<35%** → create. Keep Rejected/Converted indexed too. **Advisory — never block registration.** `/op-intake
+--reindex` triggers a full rebuild. The index contract (tags `idea-index`+`wp-index`, KV
+`wpidx:idea:<wpId>`, helper `index.sh`, lazy-heal, change detection, fallback) lives in
+`semantic-search` — don't restate it here.
 
 ## Flow (agent-driven; you move statuses on the user's command)
 `New → Under review → In discussion → Approved → Converted`, plus `Rejected`, `Deferred`.

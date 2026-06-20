@@ -25,13 +25,14 @@ parties drive OpenProject *through* this agent.
 | `skills/pm-craft/` | certified PM methodology & facilitation (the brain) |
 | `skills/openproject-pm/` | run the lifecycle in OpenProject (MCP/APIv3) |
 | `skills/openproject-devops/` | operate OpenProject (Docker) |
-| `skills/openproject-intake/` | idea/use-case discovery funnel → roadmap |
+| `skills/openproject-intake/` | idea/use-case discovery funnel → roadmap (+ semantic dedup) |
 | `skills/backlog-refinement/` | groom the delivery backlog to ready (health + DoR) |
 | `skills/delivery-metrics/` | compute velocity / burndown / throughput / runway from live data |
 | `skills/sprint-operations/` | run/close the sprint: standup, review, DoD-gated close, retro |
 | `skills/delivery-reporting/` | stakeholder/portfolio reports + the risk register (ROAM) |
 | `skills/continuous-learning/` | capture findings while working; `/op-learn` promotes them into the plugin |
-| `commands/` | `/op-setup` `/op-status` `/op-triage` `/op-intake` `/op-idea` `/op-roadmap` `/op-refine` `/op-metrics` `/op-sprint-plan` `/op-standup` `/op-sprint-review` `/op-sprint-close` `/op-retro` `/op-release` `/op-report` `/op-risks` `/op-learn` `/op-backup` `/op-upgrade` |
+| `skills/semantic-search/` | reusable semantic index over work packages; "anything like X?" / dedup by meaning |
+| `commands/` | `/op-setup` `/op-status` `/op-triage` `/op-intake` `/op-idea` `/op-roadmap` `/op-refine` `/op-metrics` `/op-sprint-plan` `/op-standup` `/op-sprint-review` `/op-sprint-close` `/op-retro` `/op-release` `/op-report` `/op-similar` `/op-risks` `/op-learn` `/op-backup` `/op-upgrade` |
 | `docs/` | primary-source reference (read these first) |
 | `docs/pm-knowledge/` | the PM knowledge catalog (grown continuously) |
 | `openproject/` | deployment workspace (cloned upstream compose stack; gitignored) |

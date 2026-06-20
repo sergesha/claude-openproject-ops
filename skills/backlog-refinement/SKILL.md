@@ -41,7 +41,7 @@ Command `/op-refine [project] [--runway N] [--top N] [--stale-days N]` or a trig
    | No AC | missing acceptance criteria | DoR #2 |
    | Orphans | no parent epic | DoR #6 |
    | Stale | no update > `--stale-days` (default 60) | review/drop |
-   | Possible duplicates | similar titles | flag, never auto-merge |
+   | Possible duplicates/overlap | semantic `similar()` over `backlog-index` (`semantic-search`) | combine/delete/split — discuss, never auto-merge |
    | Blocked | open `blocks` relations | resolve dependency |
    | Priority inversion | high-prio not-ready above ready low-prio | re-rank |
    | WIP (Scrumban) | in-progress vs limit | only if a limit is set |
@@ -49,8 +49,9 @@ Command `/op-refine [project] [--runway N] [--top N] [--stale-days N]` or a trig
 4. **Select candidates.** Top of backlog up to the ready-runway target, plus everything flagged
    above, within `--top`.
 5. **Refinement plan.** Per candidate, the concrete action vs the DoR: write AC / set estimate /
-   split into N (with proposed child titles) / re-rank / link to epic / mark duplicate /
-   **escalate if value is unclear** (see boundary below). Nothing is written yet.
+   split into N (with proposed child titles) / re-rank / link to epic / **resolve duplicate/overlap
+   (combine / delete / split — see below)** / **escalate if value is unclear** (see boundary below).
+   Nothing is written yet.
 6. **GATE — sign-off.** Show the scorecard + the plan as a change-set ("18 edits on 9 items: 3
    splits, 5 AC, 4 estimates…"). Wait for approval; selective approval is fine. Bulk/destructive
    actions (mass re-rank, closing parents on split) get explicit confirmation.
@@ -58,6 +59,19 @@ Command `/op-refine [project] [--runway N] [--top N] [--stale-days N]` or a trig
    children, relink, transition the parent; set AC/estimate/priority/parent/relations).
 8. **Report + remember.** Before/after **ready coverage** and **ready runway**, the list of changes,
    and what was escalated. Persist decisions/patterns/updated velocity to `redis-memory`.
+
+## Duplicate & overlap resolution (combine / delete / split)
+Detect by **meaning, not titles**: via the **`semantic-search`** skill (namespace `backlog`), pull
+near-dup pairs from the `backlog-index` — for each item `similar(text, "backlog-index")`, collect
+pairs **≥60%** (duplicate candidate) and **35–60%** (overlap to discuss) — embedder-calibrated bands,
+see `semantic-search`. Read the bodies before judging. Per cluster, recommend:
+- **combine** — consolidate description/AC into one item, `relates` the rest, close the redundant as
+  `duplicates` (OpenProject has no native merge); preserve history — don't silently delete.
+- **delete** — only a genuinely redundant, empty item.
+- **split** — partial overlap: extract the shared slice, or split an over-broad item (ties into the
+  oversized-split guidance).
+**Advisory — present in the change-set at the GATE; the human decides, then execute.** Surface any
+story-point double-count so runway math isn't inflated.
 
 ## Definition of Ready (canon — the bar in step 3/5)
 A story/feature is **ready** when ALL hold. If the project has a wiki page **`Definition of Ready`**,
@@ -98,4 +112,5 @@ agreements — see `CLAUDE.md`; they are not restated here.)
 - **Committing** the refined items into a sprint — stop at *ready*; `op-sprint-plan` commits.
 - Writing AC for an item whose value is unclear — escalate instead.
 - PATCHing without the current **lockVersion** — 409 / lost update.
-- Auto-merging "possible duplicates" — flag them; the human decides.
+- Detecting duplicates by **title only** or **auto-merging** them — match by meaning
+  (`semantic-search`, `backlog-index`) and discuss **combine/delete/split**; the human decides.
