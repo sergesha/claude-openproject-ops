@@ -1,0 +1,32 @@
+# Runtime / generated — keep out of the distributable plugin repo.
+# The entire deploy workspace: cloned upstream stack, .env (secrets), data, .admin-password.
+openproject/
+*.log
+
+# Local secrets never live in the repo
+**/.env
+*.secret
+*.token
+**/.admin-password
+
+# a2adapt workspace pin is environment-specific
+.a2adapt-identity
+
+# OS / editor noise
+.DS_Store
+
+# Local-only real values (IP/domain/identity) — never commit
+*.local
+
+# Instance scratchpad + its import (host-local, auto-loaded; live files sit at the workspace
+# root outside this repo — these entries are belt-and-suspenders if a copy lands inside it)
+.op-state.local.md
+CLAUDE.local.md
+
+# Internal status/plan tracker — not for the public repo
+STATUS.local.md
+PLAN.md
+
+# Superpowers specs/plans are internal — NEVER in the repo (use .superpowers/, gitignored)
+.superpowers/
+docs/superpowers/

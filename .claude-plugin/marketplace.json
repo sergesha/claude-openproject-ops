@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "claude-openproject-ops",
+  "description": "Marketplace for the claude-openproject-ops plugin: a multi-role agent toolkit for self-hosted OpenProject (certified PM/Scrum + DevOps + lifecycle driver), reachable over a2adapt.",
+  "owner": {
+    "name": "Serge Shakhmatov",
+    "email": "serge.shakhmatov@gmail.com",
+    "url": "https://github.com/sergesha"
+  },
+  "plugins": [
+    {
+      "name": "claude-openproject-ops",
+      "displayName": "OpenProject Ops",
+      "description": "Certified PM/Scrum craft + DevOps (install/upgrade/back up OpenProject via Docker slim) + driving the project lifecycle through an OpenProject MCP server. Communicates outward via an a2adapt identity.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Serge Shakhmatov",
+        "email": "serge.shakhmatov@gmail.com",
+        "url": "https://github.com/sergesha"
+      },
+      "keywords": ["openproject", "project-management", "scrum", "kanban", "prince2", "safe", "devops", "mcp", "a2adapt"],
+      "source": "./"
+    }
+  ]
+}
