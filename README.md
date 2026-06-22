@@ -32,8 +32,10 @@ parties drive OpenProject *through* this agent.
 | `skills/delivery-reporting/` | stakeholder/portfolio reports + the risk register (ROAM) |
 | `skills/continuous-learning/` | capture findings while working; `/op-learn` promotes them into the plugin |
 | `skills/semantic-search/` | reusable semantic index over work packages; "anything like X?" / dedup by meaning |
-| `commands/` | `/op-setup` `/op-status` `/op-triage` `/op-intake` `/op-idea` `/op-roadmap` `/op-refine` `/op-metrics` `/op-sprint-plan` `/op-standup` `/op-sprint-review` `/op-sprint-close` `/op-retro` `/op-release` `/op-report` `/op-similar` `/op-risks` `/op-learn` `/op-backup` `/op-upgrade` |
+| `skills/startup-navigator/` | the coach that runs the `docs/cookbook/` methodology — locate the phase, facilitate the founder's decision, delegate the mechanics (`/op-coach`) |
+| `commands/` | `/op-setup` `/op-status` `/op-triage` `/op-intake` `/op-idea` `/op-roadmap` `/op-refine` `/op-metrics` `/op-sprint-plan` `/op-standup` `/op-sprint-review` `/op-sprint-close` `/op-retro` `/op-release` `/op-report` `/op-similar` `/op-risks` `/op-learn` `/op-coach` `/op-backup` `/op-upgrade` |
 | `docs/` | primary-source reference (read these first) |
+| `docs/cookbook/` | staged startup **recipes** the agent follows to organize our work (start at `start-here.md`) |
 | `docs/pm-knowledge/` | the PM knowledge catalog (grown continuously) |
 | `openproject/` | deployment workspace (cloned upstream compose stack; gitignored) |
 | `deploy/` | reverse-proxy / external-access assets (to author) |
