@@ -67,12 +67,19 @@ fields.each do |fname, fmt, vals, mv|
     created = false
   end
   schema["fields"][fname] = cf.id
-  # attach to the Idea type so it shows on the form
-  unless idea_type.custom_field_ids.include?(cf.id)
-    idea_type.custom_field_ids = (idea_type.custom_field_ids + [cf.id]).uniq
-    idea_type.save!
-  end
   log.call "field #{fname} -> customField#{cf.id} (#{fmt}) #{created ? '(created)' : '(exists)'}"
+end
+
+# Field-per-type wiring (match the flow, not a side effect of provisioning):
+#   Idea     = RICE inputs + RICE score + Track + Lens + Tags  (NO Horizon — roadmap-only)
+#   Use case = none (inherits context via `relates`)
+#   Epic     = Horizon + Track + RICE score + Tags             (attached below)
+idea_field_names = %w[Reach Impact Confidence Effort] + ["RICE score", "Track", "Lens", "Tags"]
+idea_fids = idea_field_names.map { |n| schema["fields"][n] }.compact
+unless (idea_fids - idea_type.custom_field_ids).empty?
+  idea_type.custom_field_ids = (idea_type.custom_field_ids + idea_fids).uniq
+  idea_type.save!
+  log.call "attached Idea fields (RICE/Track/Lens/Tags — not Horizon)"
 end
 
 # roadmap Epic also carries Horizon, Track, RICE score (for swimlanes + sorting on the roadmap)

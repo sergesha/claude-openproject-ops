@@ -12,5 +12,5 @@ keyword search — catches paraphrases.
 3. `similar(query, scope)` → `mem_search(query, tags=scope, top_k=5)`; redis down → keyword
    `dedup_keyword_search` and note the search was degraded.
 4. Present ranked hits — `#id · title · similarity% · type/status` — with a one-line verdict
-   (duplicate ≥60% / related 35–60% / nothing < 35% — embedder-calibrated). Confirm the top candidates by reading them;
+   (duplicate ≥50% / related 30–50% / nothing < 30% — embedder-calibrated). Confirm the top candidates by reading them;
    recommend reuse/relate where a strong match exists. Don't auto-act — advisory.

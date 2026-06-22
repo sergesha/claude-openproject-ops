@@ -99,6 +99,10 @@ in `redis-memory` (`docs/memory-mcp.md`), namespaced by track; search it before 
 | Reclassifying a user-facing capability as a bare Task to skip AC | Keep it a Story/Feature. Quick-capture is fine, but write the AC stub, flag "unrefined" in the description, and schedule refinement before it enters a sprint — don't downgrade the type to dodge the quality bar |
 | Guessing type/status/priority IDs to save a call | Resolve them (`openproject:list_statuses`, types/priorities) — IDs vary per instance |
 | Padding estimates | Re-estimate; keep points relative & consistent |
+| Treating a `relates` **422 "already been taken"** as a failure | Benign — the link already exists; check `openproject:list_work_package_relations` first, or treat that 422 as a no-op success |
+| Putting custom-field values in the **description** | Write the real `customFieldN` via APIv3 PATCH (+ read back); description text is invisible to filters/roadmap/sort |
+| Writing an **unprovisioned** list-field value | Only provisioned custom_options exist; APIv3 can't list/create them — add via Rails (`provision.rb`) first |
+| Listing "all" work packages but getting only **open** ones | APIv3 default = open; pass `active_only=false` (or a `status` filter operator `*`) for closed/Converted/Rejected |
 | Leaving decisions only in chat | Decisions → WP comments; durable knowledge → Wiki + `redis-memory` |
 
 This agent is also the outward gateway: when acting on an a2adapt request, note which

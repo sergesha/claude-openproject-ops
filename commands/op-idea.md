@@ -13,8 +13,8 @@ Capture and triage a new idea using the `openproject-intake` skill.
    - `mem_search("<idea text>", tags="idea-index", top_k=5)` → candidates with similarity %.
    - redis down → keyword `search_work_packages` / `dedup_keyword_search` (query-expanded);
      unavailable → skip + note. Never block registration.
-   - Confirm the top candidates by reading them. Bands (embedder-calibrated): **≥60%** clear match,
-     **35–60%** related.
+   - Confirm the top candidates by reading them. Bands (embedder-calibrated): **≥50%** clear match,
+     **30–50%** related.
    - **Clear match** → present the duplicates (`#id` · title · % · status) and ask the user:
      **augment the existing item** (edit it / link `duplicates`, then reindex that WP) **or create new**.
    - **Related** → offer a `relates` link; default to create.

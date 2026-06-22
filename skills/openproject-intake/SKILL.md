@@ -78,12 +78,16 @@ Single-select list fields (Impact/Confidence/Track/Lens/Horizon) take a **custom
 a raw string. The **multi-value** field **Tags** (customField9) takes an **array** of hrefs:
 `{"_links":{"customField9":[{"href":"/api/v3/custom_options/19"},{"href":".../20"}]}}`. Numeric
 fields (Reach/Effort/RICE score) take the number directly. IDs in the scratchpad `## Intake schema`.
+**Write to the real fields, never the description** — filters, the Horizon roadmap swimlanes and the
+RICE sort read only `customFieldN`. After the PATCH, **read the WP back** to confirm the value
+persisted. List-field values must be **provisioned** options (APIv3 can't list or create
+custom_options — add a new Track/Lens via Rails/`provision.rb` first; never write a free-text value).
 
 ## Semantic deduplication (uses the `semantic-search` skill)
 Dedup ideas/use-cases **by meaning** via the **`semantic-search`** skill, namespace **`idea`**
 (project Intake, types Idea + Use case). At registration, **search before create** (see `/op-idea`):
-bands (embedder-calibrated, see `semantic-search`) **≥60%** clear match → offer augment-vs-create;
-**35–60%** related → offer `relates`; **<35%** → create. Keep Rejected/Converted indexed too. **Advisory — never block registration.** `/op-intake
+bands (embedder-calibrated, see `semantic-search`) **≥50%** clear match → offer augment-vs-create;
+**30–50%** related → offer `relates`; **<30%** → create. Keep Rejected/Converted indexed too. **Advisory — never block registration.** `/op-intake
 --reindex` triggers a full rebuild. The index contract (tags `idea-index`+`wp-index`, KV
 `wpidx:idea:<wpId>`, helper `index.sh`, lazy-heal, change detection, fallback) lives in
 `semantic-search` — don't restate it here.
@@ -145,6 +149,10 @@ OpenProject Community can't define custom relation types, so `converted_to` is e
 - Storing ideas as **Documents** (Idea/Proposal types) — UI-only, no automation. Use work packages.
 - Forgetting RICE is **computed by you** — don't expect OpenProject to calculate it.
 - Writing list custom fields as raw strings via APIv3 — they need a **custom_option href**.
+- **Dumping custom-field values into the description** instead of the real `customFieldN` — invisible
+  to filters/roadmap/RICE; PATCH the real field and read back to verify.
+- **Inventing option values** (a Track/Lens not provisioned) — only provisioned options exist (Track:
+  `General`; Lens: Strategic/Tactical/Philosophical/Applied); APIv3 can't enumerate or create them.
 - PATCHing without the current **lockVersion** — causes 409 / lost updates.
 - Trying to enable types or create fields via API — only **Rails** (`provision.rb`) can.
 - Carrying delivery work here — stop at the roadmap Epic; hand off.

@@ -30,6 +30,11 @@ Before saving, `mem_search`/`mem_list` tag `op-learn` for the same slug/theme; i
 - **Best-effort, never blocking.** If `redis-memory` is unavailable, skip silently — never stall,
   never pretend a finding was saved.
 
+**Limitation.** Ambient capture only fires when the plugin's `CLAUDE.md` is loaded in context. When
+developing the plugin from a parent cwd (a different project's `CLAUDE.md`), the rule won't trigger —
+so during plugin-dev sessions capture findings explicitly and do an end-of-session `/op-learn`
+readiness sweep before finishing.
+
 ## `/op-learn` — promote findings into the plugin
 
 1. Load open findings (`mem_list`/`mem_search` tag `op-learn`). None → report and stop.

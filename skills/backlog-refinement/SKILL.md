@@ -63,7 +63,7 @@ Command `/op-refine [project] [--runway N] [--top N] [--stale-days N]` or a trig
 ## Duplicate & overlap resolution (combine / delete / split)
 Detect by **meaning, not titles**: via the **`semantic-search`** skill (namespace `backlog`), pull
 near-dup pairs from the `backlog-index` — for each item `similar(text, "backlog-index")`, collect
-pairs **≥60%** (duplicate candidate) and **35–60%** (overlap to discuss) — embedder-calibrated bands,
+pairs **≥50%** (duplicate candidate) and **30–50%** (overlap to discuss) — embedder-calibrated bands,
 see `semantic-search`. Read the bodies before judging. Per cluster, recommend:
 - **combine** — consolidate description/AC into one item, `relates` the rest, close the redundant as
   `duplicates` (OpenProject has no native merge); preserve history — don't silently delete.

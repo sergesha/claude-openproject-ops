@@ -30,7 +30,8 @@ the delivery project, its epic/story/bug types). Corpus tags: `idea-index`, `bac
 ## Index API (agent runs these via MCP; helpers pin the deterministic parts)
 
 - **`lazy_heal(ns, corpus)`** — reconcile index ⇄ corpus; run **before any search**; best-effort.
-  1. `list_work_packages` (corpus, **all** statuses) → `wpId` + `lockVersion` (one call).
+  1. `list_work_packages` (corpus, **all** statuses — pass `active_only=false`; raw APIv3 needs a
+     `status` filter with operator `*`, since the default returns open only) → `wpId` + `lockVersion`.
   2. `kv_list("wpidx:<ns>:")` → `wpId → {memId, lockVersion, hash}`.
   3. per item, `dedup_decide`: `missing` → index (`mem_save`+`kv_set`); `fresh` → skip;
      `changed` → reindex (`mem_delete` old + `mem_save` + `kv_set`); `nontext` → update stored
@@ -38,10 +39,12 @@ the delivery project, its epic/story/bug types). Corpus tags: `idea-index`, `bac
   4. `orphan` (in KV, not in corpus = deleted) → prune (`mem_delete` + `kv_delete`).
 - **`similar(query, scope, [top_k=5])`** — `scope` = a corpus tag `<ns>-index` **or** `wp-index`
   (cross-corpus). `mem_search(query, tags=scope, top_k)` → ranked with similarity %. Bands
-  (**calibrated for the current redis-memory embedder — it scores low**): **≥60%** strong (likely
-  duplicate), **35–60%** related/overlap, **<35%** none (pure noise tops out ~25%). The score is a
-  pre-filter; **always confirm the top candidates by reading them.** If the embedder model changes,
-  recalibrate (run a few known dup/non-dup probes) and `reindex`.
+  (**calibrated for the current redis-memory embedder — it scores low**): **≥50%** strong (likely
+  duplicate), **30–50%** related/overlap, **<30%** none (pure noise tops out ~25%). Concept-level
+  duplicates land ~45–55% on this embedder, so in unattended/automated runs escalate a dense 45–60%
+  cluster to a human rather than auto-creating. The score is a pre-filter; **always confirm the top
+  candidates by reading them.** If the embedder model changes, recalibrate (run a few known
+  dup/non-dup probes) and `reindex`.
 - **`upsert(ns, wp)`** — write-through on create/edit: compute `text`/`hash`, `mem_save` + `kv_set`.
 - **`reindex(ns)`** — `kv_list("wpidx:<ns>:")` → `mem_delete` each + `kv_delete` → rebuild. Escape hatch.
 
