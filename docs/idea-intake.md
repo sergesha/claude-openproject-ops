@@ -62,8 +62,8 @@ Three axes is the ceiling — push new emergent dimensions into Tags rather than
 | converted_to | `relates` Idea→Epic + **Origin** block in Epic description + "Converted → Epic #M" comment + Idea status Converted |
 
 ## Schema IDs
-Authoritative source: the auto-loaded instance scratchpad `## Intake schema` section (written from
-`provision.rb`'s `SCHEMA_JSON`). The IDs below are illustrative defaults from one provisioning run
+Authoritative source: the instance scratchpad `## Intake schema` section (injected by the
+SessionStart hook; written from `provision.rb`'s `SCHEMA_JSON`). The IDs below are illustrative defaults from one provisioning run
 (verify against the scratchpad / live instance):
 - Types: Idea 8, Use case 9, Epic 5.
 - Fields: Reach cf1, Impact cf2, Confidence cf3, Effort cf4, RICE score cf5, Track cf6, Lens cf7, Horizon cf8, **Tags cf9 (multi-value)**.

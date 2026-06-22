@@ -8,5 +8,6 @@
   "license": "MIT",
   "keywords": ["openproject", "project-management", "scrum", "kanban", "prince2", "safe", "devops", "mcp", "a2adapt"],
   "skills": "./skills",
-  "commands": "./commands"
+  "commands": "./commands",
+  "hooks": "./hooks/hooks.json"
 }

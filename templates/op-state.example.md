@@ -1,10 +1,11 @@
-# OpenProject instance state — auto-loaded scratchpad (TEMPLATE)
+# OpenProject instance state — scratchpad (TEMPLATE)
 
 > This is the committed **template** (placeholders only — no host values). The live file is
-> `.op-state.local.md` at the workspace root, **gitignored, host-local, NO secrets** (file paths
-> only). It is auto-loaded at session start via an `@.op-state.local.md` import in the
-> workspace-root `CLAUDE.local.md`. Each section is owned and updated by one skill — see
-> `CLAUDE.md` → "Instance scratchpad". Scaffolded by `op-setup`. Keep it small (< ~60 lines).
+> `.op-state.local.md`, **gitignored, host-local, NO secrets** (file paths only), at the canonical
+> path from `scripts/op-state-path.sh` (`OP_STATE_FILE` if set, else `$HOME/.op-state.local.md`).
+> The plugin's SessionStart hook injects it; writers use the same resolver, so reader and writers
+> never diverge. Each section is owned and updated by one skill — see `CLAUDE.md` → "Instance
+> scratchpad". Scaffolded/populated by `op-setup`. Keep it small (< ~60 lines).
 
 ## Instance            <!-- owner: op-setup (openproject-devops) -->
 - url:              <https://host>

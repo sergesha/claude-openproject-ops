@@ -55,12 +55,16 @@ OP_PORT=0.0.0.0:8080 OP_HOST=op.example.com OP_HTTPS=true OP_LOW_MEM=false bash 
 2. Create an API token (*My account → Access tokens*) for the write MCP / APIv3.
 3. Smoke-test: `curl -s -u apikey:<token> http://<host>/api/v3/work_packages | head -c 200`.
 4. Record the confirmed host port / HTTPS / proxy under **CLAUDE.md → "This host"**.
-5. **Scaffold the instance scratchpad** (auto-loaded instance state — CLAUDE.md → "Instance
-   scratchpad"). At the workspace root: ensure `CLAUDE.local.md` contains the line
-   `@.op-state.local.md`, and write/update the `## Instance` section of `.op-state.local.md` from
+5. **Scaffold the instance scratchpad** (instance state delivered into every session by the plugin's
+   SessionStart hook — CLAUDE.md → "Instance scratchpad"). Resolve its **canonical path** with
+   `scripts/op-state-path.sh` (= `OP_STATE_FILE` if set, else `$HOME/.op-state.local.md`) — reader
+   (hook) and writers all use this one path, so they can't diverge. If the file is missing, create
+   it there from `templates/op-state.example.md`; then write/update the `## Instance` section from
    the deploy values — url, version, `deploy_dir`, the `~/openproject/.op-api.env` /
-   `~/openproject/.op-admin.env` paths, and the write MCP. **No secrets — file paths only.** Shape:
-   `templates/op-state.example.md`. Idempotent: update the section in place if it already exists.
+   `~/openproject/.op-admin.env` paths, and the write MCP. **No secrets — file paths only.**
+   Idempotent: update the section in place if it already exists. (No `@import` needed — the hook
+   delivers it.) If the scratchpad shouldn't live in `$HOME` (e.g. multiple instances on one host),
+   set `OP_STATE_FILE` in the agent's environment to the chosen path.
 6. **Offer to disable Claude auto-memory** (one-time). This workflow keeps instance facts in the
    scratchpad and PM knowledge in redis-memory; Claude's default free-form auto-memory (`MEMORY.md`)
    just pollutes context and isn't structured. A **plugin cannot** turn it off itself (plugin

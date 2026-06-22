@@ -15,7 +15,7 @@ skill, command, or doc that does the work.
 
 ## Standing rules (apply to every recipe)
 
-These are the repo's working agreements in **`CLAUDE.md`** — not restated here:
+These are the plugin's standing rules (from `context/operating-contract.md`) — not restated here:
 
 - **Facilitate, don't decide (PM-not-PdM).** At every *The decision you make* point the agent lays
   out options + a recommendation; **the owner decides**. Never make autonomous product/marketing calls.

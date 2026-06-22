@@ -66,8 +66,8 @@ execute.
 
 When you **create a new project**, apply the standing provisioning steps — full recipe in
 `docs/openproject-project-provisioning.md`. The concrete instance IDs (admin group/role, type
-IDs, backlogs mapping) live in the auto-loaded **instance scratchpad** → `## Provisioning IDs`
-(already in context — no lookup; see CLAUDE.md → "Instance scratchpad"). If you dispatch a
+IDs, backlogs mapping) live in the **instance scratchpad** (injected by the SessionStart hook)
+→ `## Provisioning IDs` (already in context — no lookup; see CLAUDE.md → "Instance scratchpad"). If you dispatch a
 subagent to do the work, **pass those IDs into its prompt** — subagents don't inherit the scratchpad.
 
 1. **Enable the work-package types** it needs — new projects seed only Task/Milestone/Summary

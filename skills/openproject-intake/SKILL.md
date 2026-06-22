@@ -42,8 +42,8 @@ descriptions, no secrets, no host specifics). The full ideas stay in OpenProject
 rebuildable cache (see "Semantic deduplication").
 
 ## Provisioning gate (do this first, once)
-The custom types/fields/statuses must exist. Their IDs live in the auto-loaded **instance
-scratchpad** → `## Intake schema` (already in context; CLAUDE.md → "Instance scratchpad").
+The custom types/fields/statuses must exist. Their IDs live in the **instance scratchpad**
+(injected by the SessionStart hook) → `## Intake schema` (already in context; CLAUDE.md → "Instance scratchpad").
 - **Present** → use those IDs (fields are `customFieldN`).
 - **Missing/empty** → run `provision.rb` (idempotent), then write its printed `SCHEMA_JSON` into
   the scratchpad `## Intake schema` section, and register `Intake`/`Roadmap` in `## Projects`:

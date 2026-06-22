@@ -40,6 +40,28 @@ parties drive OpenProject *through* this agent.
 | `openproject/` | deployment workspace (cloned upstream compose stack; gitignored) |
 | `deploy/` | reverse-proxy / external-access assets (to author) |
 | `identity/` | a2adapt identity / bio notes |
+| `context/` | the runtime **operating contract** (single source of truth for standing rules) |
+| `hooks/` | the **SessionStart hook** that injects the contract + instance scratchpad |
 
-See [CLAUDE.md](CLAUDE.md) for commands, working agreements, and the **continuous-learning**
-process.
+## Context delivery (operating contract & instance scratchpad)
+
+A plugin's root `CLAUDE.md` is **not** auto-loaded into sessions — it loads only when the working
+directory is the plugin repo (i.e. while developing the plugin). So the agent's standing operating
+rules can't live there; they'd never reach a runtime session in another cwd. Instead:
+
+- The **operating contract** (`context/operating-contract.md`) is the single source of truth for the
+  standing rules (disclosure boundary, no-bluffing, read-before-write, memory-best-effort, scratchpad
+  usage, `/op-coach`, …). A **SessionStart hook** (`hooks/session-context.sh`, wired in
+  `hooks/hooks.json`) prints it to stdout so Claude Code injects it into **every** top-level session,
+  addressed via `${CLAUDE_PLUGIN_ROOT}` — works from any cwd and any install location (e.g. the
+  plugin cache). It is delivered **only** by the hook, never `@import`ed/inlined in `CLAUDE.md`
+  (that would double-inject in dev sessions). Subagents don't get it — the main loop forwards what
+  they need.
+- The **instance scratchpad** (host-local `.op-state.local.md`, instance schema/IDs, no secrets) is
+  **not** shipped in the plugin. The same hook resolves it via `OP_STATE_FILE` (set per deployment)
+  or falling back to `$HOME/.op-state.local.md`, then appends it with its resolved path so the
+  agent can read-modify-write it.
+- `scripts/check-session-context.sh` is the deterministic harness for all of the above.
+
+`CLAUDE.md` carries only guidance for an agent **working on the plugin**; the standing operating
+rules and `continuous-learning` process are the contract + the `continuous-learning` skill.

@@ -7,8 +7,7 @@ The repo is a Claude **marketplace** (root `.claude-plugin/marketplace.json` →
 
 > **Memory is best-effort, never a blocker.** Every skill's "search memory first" step is
 > conditional: if this MCP is unavailable (not installed, or disabled to save RAM), proceed and
-> note that prior context wasn't consulted — never block on it (per CLAUDE.md → Working
-> agreements). Concrete deploy state for a given host lives in that host's gitignored local
+> note that prior context wasn't consulted — never block on it (per the operating contract). Concrete deploy state for a given host lives in that host's gitignored local
 > status file, not here.
 
 ## Tools (8)
@@ -63,9 +62,9 @@ installing MCP. To activate later: `claude plugin enable redis-memory@redis-memo
 
 ## How this agent should use it (two layers — keep distinct)
 
-- **Instance scratchpad** (`.op-state.local.md`, auto-loaded — see `templates/op-state.example.md`
-  and CLAUDE.md → "Instance scratchpad") — small, stable, **always-needed instance schema &
-  pointers**: the instance pointer, the project→purpose registry, provisioning IDs, the intake
+- **Instance scratchpad** (`.op-state.local.md`, injected by the SessionStart hook — see
+  `templates/op-state.example.md` and CLAUDE.md → "Instance scratchpad") — small, stable,
+  **always-needed instance schema & pointers**: the instance pointer, the project→purpose registry, provisioning IDs, the intake
   schema. Structured, skill-owned, already in context at session start. **Not** redis.
 - **redis-memory-mcp** — *cross-track, queryable PM memory*: decisions & rationale, stakeholder
   context, recurring risks, per-track state & velocity that must survive and be searchable across
