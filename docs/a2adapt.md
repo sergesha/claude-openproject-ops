@@ -96,8 +96,9 @@ from outside (openproject-pm, openproject-intake, openproject-devops, …).
 ## TODO for this project (do with the user, not unilaterally)
 
 - [ ] Stand up / locate our daemon; pin a port we verifiably own.
-- [ ] Choose the identity **name** + **bio** (proposed: "OpenProject Ops — DevOps + PM
-      gateway for a self-hosted OpenProject workspace"). Requires explicit approval.
+- [ ] Apply the identity **bio + persona** — the canonical, capability-complete draft lives in
+      `identity/README.md` (identity `openproject-ops` already exists as a role). Requires explicit
+      approval + binding; keep the draft in sync with the README skill/command tables.
 - [ ] Decide broker (local vs the shared remote broker).
 - [ ] Write `.a2adapt-identity` pin (suggestion only; bind per session on explicit yes).
 - [ ] Boot persistence (`a2adapt-mcp install-service`).
