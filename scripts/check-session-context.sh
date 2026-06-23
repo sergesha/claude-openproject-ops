@@ -47,7 +47,7 @@ if [ -z "$leakhits" ]; then pass "no host specifics in shipped files"; else bad 
 
 echo "== hooks.json wiring =="
 if [ -s "$HOOKS_JSON" ]; then
-  python3 -c "import json; json.load(open('$HOOKS_JSON'))" 2>/dev/null && pass "hooks.json valid JSON" || bad "hooks.json invalid JSON"
+  python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$HOOKS_JSON" 2>/dev/null && pass "hooks.json valid JSON" || bad "hooks.json invalid JSON"
   grep -q "SessionStart"       "$HOOKS_JSON" && pass "hooks.json: SessionStart event"            || bad "hooks.json: no SessionStart"
   grep -q 'CLAUDE_PLUGIN_ROOT' "$HOOKS_JSON" && pass "hooks.json: addresses via CLAUDE_PLUGIN_ROOT" || bad "hooks.json: not via CLAUDE_PLUGIN_ROOT"
   grep -q 'session-context'    "$HOOKS_JSON" && pass "hooks.json: runs session-context"          || bad "hooks.json: does not run session-context"
@@ -103,4 +103,4 @@ rm -rf "$TMP_HOME" "$STRAY_CWD"
 
 echo
 if [ "$fail" -eq 0 ]; then echo "ALL CHECKS PASSED"; else echo "$fail CHECK(S) FAILED"; fi
-exit $([ "$fail" -eq 0 ] && echo 0 || echo 1)
+exit "$fail"

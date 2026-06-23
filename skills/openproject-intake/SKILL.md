@@ -97,6 +97,9 @@ bands (embedder-calibrated, see `semantic-search`) **≥50%** clear match → of
 Every transition: write a one-line **rationale comment** (the decision log lives in WP history, not
 in a field). No approver roles, no committees — the user decides, you execute.
 
+**Scope note:** this skill owns items in the **Intake project** only (all statuses, including New).
+Items in delivery projects with status "New" are routed to `op-triage` / `backlog-refinement`, not here.
+
 - **New** — registered, untriaged.
 - **Under review** — screen duplicates (link `duplicates`), check scope, set draft Track/Lens.
 - **In discussion** — accumulate arguments as comments; link/create **Use cases**; fill RICE.

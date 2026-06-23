@@ -11,6 +11,7 @@ P=6; T=5; S_CLOSED=12
 jq(){ python3 -c "import sys,json;d=json.load(sys.stdin);print($1)"; }
 pass=0; fail=0; ok(){ echo "  PASS: $1"; pass=$((pass+1)); }; no(){ echo "  FAIL: $1"; fail=$((fail+1)); }
 created=()
+trap 'for id in "${created[@]+"${created[@]}"}"; do [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done' EXIT
 patch(){ local id="$1" body="$2" lv; lv=$(curl "${A[@]}" "$U/work_packages/$id" | jq "d['lockVersion']")
   echo "$body" | python3 -c "import sys,json;b=json.load(sys.stdin);b['lockVersion']=$lv;print(json.dumps(b))" \
     | curl "${J[@]}" -X PATCH "$U/work_packages/$id" -d @- -o /dev/null -w "%{http_code}"; }
@@ -44,9 +45,9 @@ MISSING=$(echo "$REG" | python3 -c "import sys,json;print(sum(1 for r in json.lo
 [ "$MISSING" = "0" ] && ok "every risk has ROAM + owner" || no "$MISSING risk(s) missing ROAM/owner"
 
 echo "== assemble stakeholder report data (outcomes + risks) =="
-REPORT=$(python3 -c "
-import json
-risks=json.loads('''$REG''')
+REPORT=$(echo "$REG" | python3 -c "
+import sys,json
+risks=json.loads(sys.stdin.read())
 outcomes=['Export feature shipped']
 lines=['# Highlight report','## Shipped']+[f'- {o}' for o in outcomes]+['## Risks (ROAM)']
 lines+=[f'- {s} [{roam}, owner {own}]' for _id,s,roam,own in risks]
@@ -64,5 +65,6 @@ else ok "report carries no secret/host/token (disclosure boundary)"; fi
 
 echo "== cleanup =="
 for id in "${created[@]}"; do curl "${A[@]}" -X DELETE "$U/work_packages/$id" -o /dev/null -w "  del #$id %{http_code}\n"; done
+created=()
 echo "== RESULT: $pass passed, $fail failed =="
 [ "$fail" -eq 0 ]

@@ -101,9 +101,9 @@ in `redis-memory` (`docs/memory-mcp.md`), namespaced by track; search it before 
 | Padding estimates | Re-estimate; keep points relative & consistent |
 | Treating a `relates` **422 "already been taken"** as a failure | Benign — the link already exists; check `openproject:list_work_package_relations` first, or treat that 422 as a no-op success |
 | Putting custom-field values in the **description** | Write the real `customFieldN` via APIv3 PATCH (+ read back); description text is invisible to filters/roadmap/sort |
-| Writing an **unprovisioned** list-field value | Only provisioned custom_options exist; APIv3 can't list/create them — add via Rails (`provision.rb`) first |
+| Writing an **unprovisioned** list-field value | Only provisioned custom_options exist; APIv3 can't list/create them — add via Rails (`skills/openproject-intake/provision.rb`) first |
 | Listing "all" work packages but getting only **open** ones | APIv3 default = open; pass `active_only=false` (or a `status` filter operator `*`) for closed/Converted/Rejected |
-| Leaving decisions only in chat | Decisions → WP comments; durable knowledge → Wiki + `redis-memory` |
+| Leaving decisions only in chat | Decisions → WP comments; durable knowledge → version/project descriptions + `redis-memory` (wiki pages require manual UI entry) |
 
 This agent is also the outward gateway: when acting on an a2adapt request, note which
 contact asked and report results back through the same channel (`docs/a2adapt.md`).

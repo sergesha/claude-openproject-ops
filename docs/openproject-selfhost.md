@@ -134,5 +134,6 @@ concurrency (`OPENPROJECT_WEB__WORKERS`, Sidekiq `*_CONCURRENCY`), and add swap.
 
 > Concrete host specifics — chosen host port, whether :80/:443 are free, sudo availability,
 > docker-group membership, RAM/CPU/swap, and whether an external reverse proxy + DNS is needed
-> (`deploy/`) — live in the deployment's **gitignored** local status file (e.g. `STATUS.local.md`)
-> and CLAUDE.md → "This host", **never in this doc**.
+> (`deploy/`) — live in the deployment's **gitignored** local files: `STATUS.local.md` for
+> operator notes and host constraints, `.op-state.local.md` for instance schema/IDs.
+> **Never in this doc.**

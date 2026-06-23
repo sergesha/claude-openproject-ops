@@ -11,6 +11,7 @@ P=6; T=5    # project Roadmap, type Epic (the type enabled there)
 jq(){ python3 -c "import sys,json;d=json.load(sys.stdin);print($1)"; }
 pass=0; fail=0; ok(){ echo "  PASS: $1"; pass=$((pass+1)); }; no(){ echo "  FAIL: $1"; fail=$((fail+1)); }
 created=()
+trap 'for id in "${created[@]+"${created[@]}"}"; do [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done' EXIT
 
 patch(){ local id="$1" body="$2" lv; lv=$(curl "${A[@]}" "$U/work_packages/$id" | jq "d['lockVersion']")
   echo "$body" | python3 -c "import sys,json;b=json.load(sys.stdin);b['lockVersion']=$lv;print(json.dumps(b))" \
@@ -43,6 +44,7 @@ ac=$(curl "${J[@]}" -X POST "$U/work_packages/$CHILD/activities" -d "{\"comment\
 
 echo "== cleanup =="
 for id in "${created[@]}"; do curl "${A[@]}" -X DELETE "$U/work_packages/$id" -o /dev/null -w "  del #$id %{http_code}\n"; done
+created=()
 
 echo "== RESULT: $pass passed, $fail failed =="
 [ "$fail" -eq 0 ]

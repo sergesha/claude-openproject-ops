@@ -6,7 +6,7 @@ argument-hint: "[project identifier] [--window N] [--days D]"
 Compute and report delivery metrics for $ARGUMENTS (use the `delivery-metrics` skill).
 
 1. Resolve the project; confirm the backlogs module is on (else story points are 0).
-2. Run `skills/delivery-metrics/metrics.sh <project> [window] [days]` — one APIv3 pass.
+2. Compute metrics using the `delivery-metrics` skill — one APIv3 pass.
 3. Report the headline numbers with the **explicit done-definition and window**:
    - **Velocity** (mean done-SP over last N closed versions, with samples),
    - **Current sprint** (committed / done / remaining / %),

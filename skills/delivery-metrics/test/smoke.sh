@@ -16,6 +16,7 @@ RB(){ (cd ~/openproject/openproject-docker-compose && docker compose exec -T web
 jq(){ python3 -c "import sys,json;d=json.load(sys.stdin);print($1)"; }
 pass=0; fail=0; ok(){ echo "  PASS: $1"; pass=$((pass+1)); }; no(){ echo "  FAIL: $1"; fail=$((fail+1)); }
 created=()
+trap 'for id in "${created[@]+"${created[@]}"}"; do [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done; [ -n "${VC:-}" ] && RB "Version.where(id:[$VC]).destroy_all" 2>/dev/null; [ -n "${VO:-}" ] && RB "Version.where(id:[$VO]).destroy_all" 2>/dev/null' EXIT
 
 echo "== create two open versions via Rails =="
 VC=$(RB 'puts Version.create!(project_id:6,name:"SMOKE-mv-closed",status:"open").id' | tr -d '[:space:]')
@@ -32,13 +33,13 @@ setstatus(){ # id status-id
 }
 
 echo "== populate work packages =="
-A1=$(mkwp 5 "$VC"); A2=$(mkwp 8 "$VC"); A3=$(mkwp 3 "$VC")      # VC: 2 done + 1 not-done
-B1=$(mkwp 8 "$VO"); B2=$(mkwp 2 "$VO")                          # VO: 1 in-progress + 1 done
-created+=("$A1" "$A2" "$A3" "$B1" "$B2")
-for id in "$A1" "$A2" "$B2"; do setstatus "$id" "$S_CLOSED" >/dev/null; done   # done items
-setstatus "$B1" "$S_INPROG" >/dev/null                                        # in-progress
+WPA1=$(mkwp 5 "$VC"); WPA2=$(mkwp 8 "$VC"); WPA3=$(mkwp 3 "$VC")      # VC: 2 done + 1 not-done
+WPB1=$(mkwp 8 "$VO"); WPB2=$(mkwp 2 "$VO")                          # VO: 1 in-progress + 1 done
+created+=("$WPA1" "$WPA2" "$WPA3" "$WPB1" "$WPB2")
+for id in "$WPA1" "$WPA2" "$WPB2"; do setstatus "$id" "$S_CLOSED" >/dev/null; done   # done items
+setstatus "$WPB1" "$S_INPROG" >/dev/null                                        # in-progress
 # verify the done transitions actually took (workflow could block)
-DONEN=0; for id in "$A1" "$A2" "$B2"; do
+DONEN=0; for id in "$WPA1" "$WPA2" "$WPB2"; do
   c=$(curl "${A[@]}" "$U/work_packages/$id" | jq "d['_links']['status']['href'].rsplit('/',1)[-1]")
   [ "$c" = "$S_CLOSED" ] && DONEN=$((DONEN+1)); done
 [ "$DONEN" -eq 3 ] && ok "status transitions applied (3 done)" || no "status transitions ($DONEN/3 done — workflow blocked?)"
@@ -62,6 +63,7 @@ THR=$(echo "$JSON" | jq "d['throughput']")
 echo "== cleanup =="
 for id in "${created[@]}"; do curl "${A[@]}" -X DELETE "$U/work_packages/$id" -o /dev/null -w "  del wp #$id %{http_code}\n"; done
 RB "Version.where(id:[$VC,$VO]).destroy_all" >/dev/null && echo "  versions deleted"
+created=(); VC=; VO=
 
 echo "== RESULT: $pass passed, $fail failed =="
 [ "$fail" -eq 0 ]

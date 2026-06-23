@@ -30,6 +30,8 @@ Command `/op-refine [project] [--runway N] [--top N] [--stale-days N]` or a trig
    `redis-memory` for prior decisions on the track. Ambiguous which project/track → ask, don't guess.
 2. **Define the delivery backlog.** A priority-sorted query, **excluding intake/new** (status=New
    with no version is `op-triage`'s zone). State the query you used.
+   **Boundary note:** items in the **Intake project** belong to `openproject-intake` regardless of
+   status; `op-triage` handles "New" items only in **delivery projects**.
 3. **Backlog-health scorecard (read-only).** Always produce this table over the top-`N` (default 30):
 
    | Metric | How | Signal |
@@ -74,15 +76,16 @@ see `semantic-search`. Read the bodies before judging. Per cluster, recommend:
 story-point double-count so runway math isn't inflated.
 
 ## Definition of Ready (canon — the bar in step 3/5)
-A story/feature is **ready** when ALL hold. If the project has a wiki page **`Definition of Ready`**,
-read and apply that instead (log "using project DoR").
+A story/feature is **ready** when ALL hold. If the project has a Definition of Ready document (ask the user to provide it, or check the project/version description), apply that instead.
 
 1. **Value clear** — title = user-visible value (INVEST).
 2. **Acceptance criteria** present, Gherkin (Given/When/Then), testable, as checkboxes.
 3. **Estimated & small** — an estimate is set; ≤ 8 ready, 9–12 split candidate, **≥ 13 must split**.
-   Estimate field = **story points** if the backlogs module is enabled, otherwise the project's
-   configured estimate (`estimatedTime` / "Work", or a custom field). Detect which at step 1; the
-   8/13 thresholds are story-point values — rescale if the unit differs.
+   Estimate field priority (detect at step 1):
+   1. If backlogs module enabled → **storyPoints**.
+   2. Else if the project has an `estimatedTime` ("Work") field → use that.
+   3. Else → **ask the user** which field to use; don't guess.
+   The 8/13 thresholds are story-point values — rescale if the unit differs.
 4. **Priority** set.
 5. **Dependencies** identified and non-blocking.
 6. **Parent epic** linked; type/category set.
@@ -91,6 +94,13 @@ read and apply that instead (log "using project DoR").
 Bug variant of #1–2: repro steps + expected/actual + severity→priority.
 
 ## Framework → runway rubric (detect, don't impose)
+Detection signals (evaluated at step 1 from the project's versions, WIP settings, and structure):
+- **Scrum** — project has versions with start/end dates used as sprints.
+- **Kanban** — project uses WIP limits or has no sprint-like versions.
+- **Scrumban** — has sprint versions AND WIP limits.
+- **PRINCE2** — project uses phases/stages as versions.
+- Default to **Scrum** if the signals are ambiguous.
+
 - **Scrum** — continuous ceremony (~10% capacity); runway target = *N sprints* of ready work
   (`facilitation-and-ceremonies.md`).
 - **Scrumban/Kanban** — this is **replenishment**: refill the ready queue when WIP drops below the

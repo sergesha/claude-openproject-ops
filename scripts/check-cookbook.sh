@@ -21,7 +21,7 @@ echo "== index ($INDEX) =="
 if [ -f "$INDEX" ]; then
   grep -q '## Phase N — <Name>' "$INDEX" && pass "template block present" || bad "template block missing"
   grep -q 'scattered-thoughts-to-predictable-delivery.md' "$INDEX" && pass "recipe #1 in TOC" || bad "recipe #1 not in TOC"
-  grep -q 'CLAUDE.md' "$INDEX" && pass "standing rules reference CLAUDE.md" || bad "CLAUDE.md reference missing"
+  grep -q 'operating-contract.md' "$INDEX" && pass "standing rules reference operating-contract" || bad "operating-contract reference missing"
 fi
 
 echo "== recipe template-conformance ($RECIPE) =="
@@ -53,13 +53,13 @@ fi
 echo "== link integrity (file-resolvable refs) =="
 for f in "$INDEX" "$RECIPE" "$NAV"; do
   [ -f "$f" ] || continue
-  for cmd in $(grep -oE '/op-[a-z-]+' "$f" | sort -u); do
+  while IFS= read -r cmd; do
     p="commands${cmd}.md"
     [ -f "$p" ] && pass "$f -> $p" || bad "$f links $cmd but $p missing"
-  done
-  for path in $(grep -oE '(docs|skills|commands|scripts)/[A-Za-z0-9_./-]+' "$f" | sed 's/[.,):]*$//' | sort -u); do
+  done < <(grep -oE '/op-[a-z-]+' "$f" | sort -u)
+  while IFS= read -r path; do
     [ -e "$path" ] && pass "$f -> $path" || bad "$f links $path (missing)"
-  done
+  done < <(grep -oE '(docs|skills|commands|scripts)/[A-Za-z0-9_./-]+' "$f" | sed 's/[.,):]*$//' | sort -u)
 done
 
 echo "== no-leak (host/secret patterns must be absent) =="

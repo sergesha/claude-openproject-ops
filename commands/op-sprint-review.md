@@ -5,6 +5,7 @@ argument-hint: "<project> [sprint/version name]"
 
 Run the sprint review for $ARGUMENTS (use the `sprint-operations` skill).
 
+0. If no active sprint/version exists for the project, report this to the user and stop — don't proceed with stale data.
 1. Inspect the increment — the DoD-passing items completed this sprint.
 2. Collect stakeholder feedback; turn each item into a **follow-up work package** (not a buried
    comment). Respect the outbound-disclosure boundary if reporting outward.

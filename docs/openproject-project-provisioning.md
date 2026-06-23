@@ -5,8 +5,8 @@ no native "group in all projects" and seeds only a minimal set of work-package t
 project, so these steps are enforced by the agent (or via a project template).
 
 > Concrete instance values (the actual group/role IDs, member logins, which projects have
-> Backlogs) are host-specific and live in the gitignored `STATUS.local.md`, **not here.** This
-> doc is the generic technique; substitute the real IDs at run time.
+> Backlogs) are host-specific and live in the gitignored instance scratchpad (`.op-state.local.md`),
+> **not here.** This doc is the generic technique; substitute the real IDs at run time.
 
 Run Rails recipes from `openproject/openproject-docker-compose/`:
 `docker compose exec -T web bundle exec rails runner '<ruby>'`.

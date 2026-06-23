@@ -56,7 +56,7 @@ one person above their availability.
   current snapshot + remaining, not a day-by-day curve. Treat OpenProject Backlogs charts as a
   visual cross-check, not the source of truth — the source is this computation.
 - Story points come from the backlogs module; if it's off, points are 0 and velocity is unusable —
-  enable backlogs on delivery projects ([[op-backlogs-on-delivery-projects]]).
+  enable backlogs on delivery projects (Administration → Projects → [project] → Modules → check Backlogs; or via the provisioning script `skills/openproject-intake/provision.rb`).
 
 ## Common mistakes
 - Reporting velocity without the **done-definition and window** — always state both.

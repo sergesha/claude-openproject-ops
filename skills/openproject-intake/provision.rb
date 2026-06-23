@@ -7,11 +7,13 @@ require "json"
 log = ->(m) { puts "  #{m}" }
 schema = { "types" => {}, "fields" => {}, "statuses" => {}, "projects" => {}, "roles" => {} }
 
+begin
+
 # --- 1. Work package types ---------------------------------------------------
-def upsert_type(name)
+def upsert_type(name, is_in_roadmap: (name != "Idea"))
   t = Type.find_by(name: name)
   return [t, false] if t
-  t = Type.new(name: name, is_default: false, is_in_roadmap: true, is_milestone: false)
+  t = Type.new(name: name, is_default: false, is_in_roadmap: is_in_roadmap, is_milestone: false)
   t.color = Color.first if t.respond_to?(:color=) && Color.any?
   t.position = (Type.maximum(:position) || 0) + 1
   t.save!
@@ -27,8 +29,9 @@ uc, created = upsert_type("Use case")
 schema["types"]["Use case"] = uc.id
 log.call "type Use case ##{uc.id} #{created ? '(created)' : '(exists)'}"
 epic = Type.find_by(name: "Epic")
-schema["types"]["Epic"] = epic&.id
-log.call "type Epic ##{epic&.id} (existing)"
+raise "Epic type not found — seed OpenProject or add it to the upsert list" unless epic
+schema["types"]["Epic"] = epic.id
+log.call "type Epic ##{epic.id} (existing)"
 
 idea_type = Type.find_by(name: "Idea")
 
@@ -148,7 +151,7 @@ schema["projects"]["Roadmap"] = roadmap.id
 log.call "project Roadmap ##{roadmap.id} #{c2 ? '(created)' : '(exists)'}"
 
 # make admin a member of both with a role that can edit WPs (so API transitions work)
-admin = User.find_by(login: "admin")
+admin = User.find_by(login: "admin") || User.where(admin: true).first
 mgr = Role.givable.detect { |r| r.has_permission?(:edit_work_packages) } || Role.givable.first
 [intake, roadmap].each do |proj|
   next unless admin && mgr
@@ -159,3 +162,10 @@ mgr = Role.givable.detect { |r| r.has_permission?(:edit_work_packages) } || Role
 end
 
 puts "SCHEMA_JSON=#{schema.to_json}"
+
+rescue StandardError => e
+  $stderr.puts "\n\nPROVISIONING FAILED: #{e.class}: #{e.message}"
+  $stderr.puts e.backtrace.first(5).join("\n")
+  $stderr.puts "\nPartial schema: #{schema.to_json}" if schema
+  raise
+end

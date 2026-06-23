@@ -5,6 +5,7 @@ argument-hint: "<project> [sprint/version name]"
 
 Close the sprint for $ARGUMENTS (use the `sprint-operations` skill; metrics via `delivery-metrics`).
 
+0. If no active sprint/version exists for the project, report this to the user and stop — don't proceed with stale data.
 1. Pull the sprint Version's items; snapshot remaining/burndown via `/op-metrics`.
 2. **Verify each "complete" item against the Definition of Done.** Any unmet criterion → **do not
    close it**; report the specific gap and leave it open. Closing a DoD-failing item is forbidden.

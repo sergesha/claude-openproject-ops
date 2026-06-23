@@ -10,30 +10,17 @@ versioned skills/docs/commands. **Memory holds only OPEN findings; git is the on
 what was learned and fixed.** A finding's presence in memory *is* its "open" status — there is
 no other status, and nothing stays in memory once it's handled.
 
-## Capture a finding (during any work)
+## Capture (the operating contract checkpoint does this)
 
-Save one structured entry via `mem_save`, tag **`op-learn`**, when something is worth changing
-how the agent works next time — a tool/API/MCP surprise, a wrong or missing doc, a needed
-workaround, or a materially better approach. Not routine successes, not trivia.
+The operating contract requires every task completion to end with an `op-learn:` line.
+That checkpoint is the capture mechanism — this skill does NOT restate it.
 
-Entry fields: `slug` · `category` (bug/gap/insight/friction/decision) · `context` · `observation`
-· `lesson` · `proposed_change`.
+**What qualifies:** a tool/API/MCP surprise, a wrong or missing doc, a needed workaround, or a
+materially better approach. **Not** routine successes, expected outcomes, files you created.
 
-Before saving, `mem_search`/`mem_list` tag `op-learn` for the same slug/theme; if it exists, skip.
-
-**Hard rules:**
-- **No instance specifics — at all.** No hostname, domain, IP, port, path, `.env`, token, or
-  Docker topology — **not even as a "confirmed on" data point.** Abstract to technique ("confirmed
-  on a 17.x slim deploy", never the host). Same outbound-disclosure boundary as everywhere.
-- **No status field.** Don't write `Status: PENDING`/`DONE` into a finding. In-memory = open;
-  handled = deleted. Memory is not a TODO tracker.
-- **Best-effort, never blocking.** If `redis-memory` is unavailable, skip silently — never stall,
-  never pretend a finding was saved.
-
-**Limitation.** Ambient capture only fires when the plugin's `CLAUDE.md` is loaded in context. When
-developing the plugin from a parent cwd (a different project's `CLAUDE.md`), the rule won't trigger —
-so during plugin-dev sessions capture findings explicitly and do an end-of-session `/op-learn`
-readiness sweep before finishing.
+**Format:** `[slug] surprise → what to change`. No instance specifics (hostnames, IPs, paths,
+tokens) — abstract to technique. No status fields (in-memory = open; handled = deleted).
+Best-effort: if redis-memory is unavailable, skip silently.
 
 ## `/op-learn` — promote findings into the plugin
 

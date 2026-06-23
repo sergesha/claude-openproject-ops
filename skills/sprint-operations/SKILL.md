@@ -19,8 +19,7 @@ closed because someone says so — it is closed because it meets the DoD.
   `backlog-refinement` / `/op-refine`; computing velocity/burndown → `delivery-metrics`.
 
 ## Definition of Done (canon — the close gate)
-An item is **done** only when ALL hold. If the project has a wiki page **`Definition of Done`**,
-read and apply that instead (log "using project DoD").
+An item is **done** only when ALL hold. If the project has a Definition of Done document (ask the user to provide it, or check the version/project description), apply that instead.
 
 1. **All acceptance criteria met** (checkboxes verified, not just present).
 2. **Reviewed** — change reviewed/merged where applicable.
@@ -45,8 +44,8 @@ DoD gates exit.
 
 ## Standup (`/op-standup`)
 Current-sprint board state by status + **blockers** + **aging**: in-progress items not updated in
-> N days, and items blocked > N days. Re-plan toward the sprint goal; this is a working session,
-not a status report.
+> N days, and items blocked > N days (N = 3 business days unless the user specifies `--aging-days`).
+Re-plan toward the sprint goal; this is a working session, not a status report.
 
 **Blocked-work loop (don't just detect):** for each blocked item — name the **impediment owner**,
 the blocking item, and age; if blocked > N days, **escalate** it explicitly in the report. Surface →
@@ -60,7 +59,7 @@ into a **follow-up work package** (don't lose it in a comment). Adapt the backlo
 ## Retrospective (`/op-retro`)
 Run a format (went-well / didn't / actions, or Start-Stop-Continue). Pick **a few** improvements and
 create an **owned improvement work package** for each (so actions don't evaporate). Record the retro
-summary on a wiki page or the sprint version description.
+summary in the sprint version description (wiki pages require manual UI entry — offer the content for the user to paste).
 
 ## Common mistakes
 - Closing an item that fails the DoD because it's "basically done" — verify, don't assume.

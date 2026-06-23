@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# dedup.sh — deterministic helpers for the intake semantic-dedup index.
+# index.sh — deterministic helpers for the semantic-search index.
 # Pinning text+hash here keeps every session's index byte-compatible (same tag/key/format).
-# Pure (no network) except dedup_keyword_search. Source me: . ./dedup.sh
+# Pure (no network) except dedup_keyword_search. Source me: . ./index.sh
 
 # Normalize for hashing: lowercase, collapse whitespace, trim.
 _dedup_norm(){ printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -s '[:space:]' ' ' | sed 's/^ //;s/ $//'; }
@@ -31,7 +31,8 @@ dedup_decide(){ # in_index(yes|no) lv_changed(yes|no) hash_changed(yes|no)
 # Echoes matching WP ids, one per line. Requires $U and the $A curl-auth array in scope.
 dedup_keyword_search(){ # "query terms" [pageSize]
   local q="$1" n="${2:-5}"
-  local filt="[{\"search\":{\"operator\":\"**\",\"values\":[\"$q\"]}}]"
+  local filt
+  filt=$(python3 -c "import json,sys; print(json.dumps([{'search':{'operator':'**','values':[sys.argv[1]]}}]))" "$q")
   curl "${A[@]}" -G "$U/work_packages" \
     --data-urlencode "filters=$filt" --data-urlencode "pageSize=$n" \
   | python3 -c "import sys,json;d=json.load(sys.stdin);print('\n'.join(str(e['id']) for e in d['_embedded']['elements']))"

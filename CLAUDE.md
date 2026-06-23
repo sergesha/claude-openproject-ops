@@ -20,13 +20,17 @@ Four interlocking roles → their skills (details live in each skill):
 ```
 .claude-plugin/   plugin + marketplace manifests
 skills/           pm-craft · openproject-pm · openproject-devops · openproject-intake ·
-                  backlog-refinement · delivery-metrics · sprint-operations · delivery-reporting
+                  backlog-refinement · delivery-metrics · sprint-operations · delivery-reporting ·
+                  continuous-learning · semantic-search · startup-navigator
 commands/         /op-* slash commands (setup, status, triage, refine, metrics, sprint-*, report, risks, release, …)
 context/          the runtime operating contract (single source of truth for standing rules)
 hooks/            SessionStart hook — injects the contract + instance scratchpad into every session
 docs/             primary-source reference — READ before non-trivial work; docs/pm-knowledge/ catalog
 templates/        committed scaffolding templates (op-state.example.md — instance scratchpad schema)
-openproject/      deployment workspace (gitignored)  ·  deploy/  external-access  ·  identity/  a2adapt
+scripts/          op-state-path.sh · setup.sh · check-cookbook.sh · check-session-context.sh · test-*
+openproject/      deployment workspace (gitignored)
+deploy/           external-access reverse-proxy + restore runbook (committed)
+identity/         a2adapt identity bio/persona (committed)
 ```
 
 Treat `docs/*` as the source of truth distilled from primary docs; if OpenProject (or a

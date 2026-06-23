@@ -22,6 +22,7 @@ OPT_IMPACT2=4; OPT_CONF80=7; OPT_TRACK_GEN=9; OPT_LENS_STRAT=10; OPT_HORIZON_NEX
 CF_TAGS=9; OPT_TAG_SEC=19; OPT_TAG_QW=21
 
 created=()   # work package ids to clean up
+trap 'for id in "${created[@]+"${created[@]}"}"; do [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done' EXIT
 
 patch(){ # id  json-without-lockversion  -> merges current lockVersion
   local id="$1" body="$2"
@@ -81,7 +82,6 @@ ETAGN=$(curl "${A[@]}" "$U/work_packages/$EPIC" | jq "len(d['_links'].get('custo
 echo "== relate Idea->Epic, mark Converted =="
 curl "${J[@]}" -X POST "$U/work_packages/$IDEA/relations" -d "{\"type\":\"relates\",\"_links\":{\"to\":{\"href\":\"/api/v3/work_packages/$EPIC\"}}}" -o /dev/null
 curl "${J[@]}" -X POST "$U/work_packages/$IDEA/activities" -d "{\"comment\":{\"raw\":\"Converted → Epic #$EPIC\"}}" -o /dev/null
-code=$(patch "$IDEA" "{\"_links\":{\"status\":{\"href\":\"/api/v3/statuses/$S_CONVERTED}\"}}}" 2>/dev/null || true)
 code=$(patch "$IDEA" "{\"_links\":{\"status\":{\"href\":\"/api/v3/statuses/$S_CONVERTED\"}}}")
 ST=$(curl "${A[@]}" "$U/work_packages/$IDEA" | jq "d['_links']['status']['title']")
 [ "$ST" = "Converted" ] && ok "Idea status = $ST" || no "Idea status = $ST (want Converted)"

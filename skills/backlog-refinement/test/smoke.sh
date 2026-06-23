@@ -27,6 +27,7 @@ jq(){ python3 -c "import sys,json;d=json.load(sys.stdin);print($1)"; }
 T_STORY=5; T_EPIC=5; P=6           # Epic type, project Roadmap
 DOR_MAX=8; SPLIT_AT=13              # story-point thresholds (≤8 ready, ≥13 must split)
 created=()                          # work package ids to clean up (children first on delete)
+trap 'for ((i=${#created[@]}-1; i>=0; i--)); do id=${created[$i]}; [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done' EXIT
 
 mkwp(){ # subject  story-points-or-empty  description-raw  parent-id-or-empty  -> id
   local subj="$1" est="$2" desc="$3" par="$4"
@@ -75,11 +76,6 @@ echo "== T3: detect health signals from real data =="
 [ "$(has_ac "$OVERSIZED")" = "no" ] && ok "no-AC detected" || no "no-AC"
 [ "$(has_parent "$ORPHAN")" = "no" ] && ok "orphan (no parent) detected" || no "orphan"
 # duplicate heuristic: identical normalized subjects
-DUPN=$(curl "${A[@]}" "$U/work_packages/$DUP1" "$U/work_packages/$DUP2" 2>/dev/null; \
-  python3 -c "
-import json,urllib.request,os
-h={'Authorization':None}
-" 2>/dev/null || true)
 S1=$(curl "${A[@]}" "$U/work_packages/$DUP1" | jq "d['subject']")
 S2=$(curl "${A[@]}" "$U/work_packages/$DUP2" | jq "d['subject']")
 [ "$S1" = "$S2" ] && ok "possible-duplicate detected (identical subjects, flagged not merged)" || no "duplicate detect"
@@ -118,6 +114,7 @@ for ((i=${#created[@]}-1; i>=0; i--)); do
   id=${created[$i]}
   curl "${A[@]}" -X DELETE "$U/work_packages/$id" -o /dev/null -w "  del #$id HTTP %{http_code}\n"
 done
+created=()
 
 echo "== RESULT: $pass passed, $fail failed =="
 [ "$fail" -eq 0 ]

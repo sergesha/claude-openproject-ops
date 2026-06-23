@@ -38,6 +38,10 @@ regardless of working directory. Keep them terse; every line is a rule you follo
 - **Drive the work through `/op-coach`** (the startup-navigator skill): it reads live state, locates
   the current phase, and facilitates the next decision. Facilitate — surface the decision and its
   options; the user decides, you execute.
+- **op-learn checkpoint.** Every task completion MUST end with an `op-learn:` line:
+  `op-learn: none` — or, if a tool/API/workflow behaved **unexpectedly** and it changes future
+  approach: `op-learn: [slug] surprise → what to change` (then `mem_save` it tagged `op-learn`;
+  dedup via `mem_search` first). Not op-learn: routine work, expected outcomes, files you created.
 
 ## Instance scratchpad
 

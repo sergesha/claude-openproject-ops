@@ -46,13 +46,18 @@ No arg → locate + run the current phase. Explicit `phase` → coach that phase
 | Phase | Founder-facing (this skill facilitates) | Mechanics (delegate to) |
 |---|---|---|
 | 1 Converge | draft the one-sentence thesis | `/op-idea` (capture), `/op-similar` (merge dupes), set **Track** per theme |
-| 2 Model | draft the Lean Canvas | project **Wiki** (no command — Wiki is its home) |
+| 2 Model | draft the Lean Canvas | project **Wiki*** (no command — Wiki is its home) |
 | 3 Validate | frame riskiest assumptions + experiments | `/op-idea` / intake (Use cases tagged `experiment`), `/op-similar` |
-| 4 Focus | draft MVP cut / positioning / pricing | **Wiki**; tag in-MVP items `mvp` |
-| 5 Set goals | draft 1 Objective + ~3 KRs + North-Star | **Wiki**/Epic |
+| 4 Focus | draft MVP cut / positioning / pricing | **Wiki***; tag in-MVP items `mvp` |
+| 5 Set goals | draft 1 Objective + ~3 KRs + North-Star | **Wiki***/Epic |
 | 6 Prioritize & roadmap | propose scores + horizons | RICE (intake), `/op-roadmap` |
 | 7 Deliver predictably | recommend cadence + readiness | `/op-refine`, `/op-standup`, `/op-sprint-plan`/`-review`/`-close`, `/op-metrics` |
 | 8 Measure & steer | summarize OKR/North-Star movement + options | `/op-metrics`, `/op-report`, `/op-retro`, `/op-risks` |
+
+*\*Wiki interaction:* OpenProject Community APIv3 does not expose wiki-page endpoints. For phases
+that produce a Wiki artifact (Lean Canvas, positioning, goals), prompt the user to create/update
+the wiki page in the OpenProject UI and provide the content to paste. Alternatively, if a future
+API version adds `POST/PUT /api/v3/wiki_pages`, use that directly.
 
 ## The boundary — facilitate, never decide (PM-not-PdM)
 Every business/product judgment is the **founder's**: the thesis, what to validate, which ideas to

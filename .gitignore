@@ -30,3 +30,12 @@ PLAN.md
 # Superpowers specs/plans are internal — NEVER in the repo (use .superpowers/, gitignored)
 .superpowers/
 docs/superpowers/
+
+# Defense-in-depth
+*.pem
+*.key
+*.p12
+*.bak
+*.swp
+*.swo
+*~

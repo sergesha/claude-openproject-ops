@@ -1,11 +1,12 @@
 ---
 description: Plan a sprint (OpenProject Version) for a project/track
-argument-hint: "<project identifier> [sprint length, e.g. 2w]"
+argument-hint: "<project> [sprint length, e.g. 2w]"
 ---
 
 Facilitate sprint planning for $ARGUMENTS (use `pm-craft` for the craft, `openproject-pm`
 to apply changes).
 
+0. Check whether an **open** sprint/version already exists for the project. If so, confirm with the user before creating another — avoid overlapping sprints.
 1. Inputs: refined backlog (priority-sorted query), recent **velocity** (compute via
    `/op-metrics` — the `delivery-metrics` skill), team capacity (per-person availability) for the
    period. Check committed SP ≤ velocity and per-assignee load ≤ availability (over-allocation).

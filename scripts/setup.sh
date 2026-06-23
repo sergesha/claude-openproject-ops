@@ -48,7 +48,7 @@ command -v git    >/dev/null || die "git not found"
 command -v curl   >/dev/null || die "curl not found"
 command -v docker >/dev/null || die "docker not found"
 docker compose version >/dev/null 2>&1 || die "docker compose v2 plugin not found"
-docker info >/dev/null 2>&1 || die "docker daemon not reachable (is it running / are you in the docker group?)"
+timeout 10 docker info >/dev/null 2>&1 || die "Docker daemon not reachable (is Docker running?)"
 case "$OP_TAG" in *-slim) : ;; *) die "OP_TAG must be a -slim tag (got '$OP_TAG'); the compose stack requires slim images" ;; esac
 
 # --- clone or update ---------------------------------------------------------
@@ -71,7 +71,11 @@ set_env() {
   local key="$1" val="$2"
   if grep -qE "^${key}=" .env; then
     # use a non-/ delimiter; values may contain / and :
-    sed -i "s|^${key}=.*|${key}=${val}|" .env
+    # escape sed-special chars in val: \ must be first (avoid double-escaping)
+    local escaped_val="${val//\\/\\\\}"
+    escaped_val="${escaped_val//&/\\&}"
+    escaped_val="${escaped_val//|/\\|}"
+    sed -i "s|^${key}=.*|${key}=${escaped_val}|" .env
   else
     printf '%s=%s\n' "$key" "$val" >> .env
   fi
@@ -83,6 +87,7 @@ if [ -f .env ]; then
 else
   log "Creating .env from .env.example"
   cp .env.example .env
+  chmod 600 .env
   FRESH_ENV=true
 fi
 
@@ -108,6 +113,8 @@ if [ "$OP_LOW_MEM" = "true" ]; then
   set_env RAILS_MAX_THREADS 4
 fi
 
+chmod 600 .env
+
 # --- bring up ----------------------------------------------------------------
 log "Starting stack (docker compose up -d --pull $OP_PULL) — first boot migrates+seeds (minutes)"
 docker compose up -d --pull "$OP_PULL"
@@ -118,6 +125,7 @@ PROBE_PORT="${OP_PORT##*:}"
 PROBE_HOST="127.0.0.1"
 HEALTH_URL="http://${PROBE_HOST}:${PROBE_PORT}/health_checks/default"
 log "Waiting up to ${OP_WAIT}s for $HEALTH_URL"
+if ! [[ "$OP_WAIT" =~ ^[0-9]+$ ]]; then echo "ERROR: OP_WAIT must be a number, got '$OP_WAIT'" >&2; exit 1; fi
 deadline=$(( $(date +%s) + OP_WAIT ))
 ok=false
 while [ "$(date +%s)" -lt "$deadline" ]; do

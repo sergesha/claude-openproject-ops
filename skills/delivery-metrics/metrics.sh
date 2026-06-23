@@ -12,25 +12,51 @@
 # Requires ~/openproject/.op-api.env (OPENPROJECT_URL, OPENPROJECT_API_KEY). Outputs a readable
 # summary then a JSON blob (last line) for programmatic use. Degrades gracefully when data is thin.
 set -euo pipefail
+[ -f ~/openproject/.op-api.env ] || { echo "ERROR: ~/openproject/.op-api.env not found" >&2; exit 1; }
 set -a; . ~/openproject/.op-api.env; set +a
+: "${OPENPROJECT_URL:?OPENPROJECT_URL not set in .op-api.env}"
+: "${OPENPROJECT_API_KEY:?OPENPROJECT_API_KEY not set in .op-api.env}"
 U="$OPENPROJECT_URL/api/v3"; A=(-s -u "apikey:$OPENPROJECT_API_KEY")
 P="${1:?project id required}"; WINDOW="${2:-3}"; DAYS="${3:-14}"
+[[ "$P" =~ ^[0-9]+$ ]] || { echo "ERROR: PROJECT_ID must be numeric" >&2; exit 1; }
+[[ "$WINDOW" =~ ^[0-9]+$ ]] || { echo "ERROR: WINDOW must be numeric" >&2; exit 1; }
+[[ "$DAYS" =~ ^[0-9]+$ ]] || { echo "ERROR: DAYS must be numeric" >&2; exit 1; }
+
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
 
 # status id -> {name, isClosed}
-STATUSES=$(curl "${A[@]}" "$U/statuses")
+curl "${A[@]}" "$U/statuses" > "$TMPDIR/statuses.json"
 # versions of the project (id, name, status open/closed/locked)
-VERSIONS=$(curl "${A[@]}" "$U/projects/$P/versions")
-# all work packages of the project (paginate up to 1000). The status filter with operator "*"
+curl "${A[@]}" "$U/projects/$P/versions" > "$TMPDIR/versions.json"
+# all work packages of the project (paginated). The status filter with operator "*"
 # overrides the default "open only" query so CLOSED (done) items are included — essential, since
 # velocity/throughput are computed from done work.
+# Decoded: [{"status":{"operator":"*","values":[]}}]  — include closed items
 ALLSTATUS='%5B%7B%22status%22%3A%7B%22operator%22%3A%22*%22%2C%22values%22%3A%5B%5D%7D%7D%5D'
-WPS=$(curl "${A[@]}" "$U/projects/$P/work_packages?pageSize=1000&filters=$ALLSTATUS")
+PAGE=1; PAGESIZE=1000
+while true; do
+  OFFSET=$(( (PAGE - 1) * PAGESIZE ))
+  curl "${A[@]}" "$U/projects/$P/work_packages?pageSize=$PAGESIZE&offset=$OFFSET&filters=$ALLSTATUS" \
+    > "$TMPDIR/wps_page_${PAGE}.json"
+  TOTAL=$(python3 -c "import sys,json; print(json.load(open(sys.argv[1]))['total'])" "$TMPDIR/wps_page_${PAGE}.json") \
+    || { echo "ERROR: failed to parse API response" >&2; exit 1; }
+  if [ $(( OFFSET + PAGESIZE )) -ge "$TOTAL" ]; then break; fi
+  PAGE=$((PAGE + 1))
+done
 
-export STATUSES VERSIONS WPS P
-python3 - "$WINDOW" "$DAYS" <<'PY'
-import sys, json, datetime, os
+python3 - "$WINDOW" "$DAYS" "$P" "$TMPDIR" <<'PY'
+import sys, json, datetime, os, glob
 window, days = int(sys.argv[1]), int(sys.argv[2])
-S = json.loads(os.environ['STATUSES']); V = json.loads(os.environ['VERSIONS']); W = json.loads(os.environ['WPS'])
+project_id = sys.argv[3]
+tmpdir = sys.argv[4]
+S = json.load(open(os.path.join(tmpdir, 'statuses.json')))
+V = json.load(open(os.path.join(tmpdir, 'versions.json')))
+# merge paginated work-package pages
+wp_pages = sorted(glob.glob(os.path.join(tmpdir, 'wps_page_*.json')))
+W = json.load(open(wp_pages[0]))
+for pg in wp_pages[1:]:
+    W['_embedded']['elements'] += json.load(open(pg))['_embedded']['elements']
 
 st = {}                                   # status id -> (name, isClosed)
 for s in S['_embedded']['elements']:
@@ -92,7 +118,7 @@ ready_runway = None
 if velocity and current is not None:
     ready_runway = round(current['remaining']/velocity, 1) if velocity else None
 
-print(f"== Delivery metrics (project {os.environ.get('P','?')}) ==")
+print(f"== Delivery metrics (project {project_id}) ==")
 print(f"Done = status.isClosed and name != 'Rejected'. Velocity window = last {window} closed versions.")
 print(f"Velocity        : {velocity if velocity is not None else 'insufficient data (no closed versions with points)'}"
       + (f"  samples={vel_samples}" if vel_samples else ''))

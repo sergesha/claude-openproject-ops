@@ -11,10 +11,12 @@ RB(){ (cd ~/openproject/openproject-docker-compose && docker compose exec -T web
 jq(){ python3 -c "import sys,json;d=json.load(sys.stdin);print($1)"; }
 pass=0; fail=0; ok(){ echo "  PASS: $1"; pass=$((pass+1)); }; no(){ echo "  FAIL: $1"; fail=$((fail+1)); }
 created=()
+trap 'for id in "${created[@]+"${created[@]}"}"; do [ -n "$id" ] && curl "${A[@]}" -X DELETE "$U/work_packages/$id" 2>/dev/null; done; [ -n "${REL:-}" ] && RB "Version.where(id:[$REL]).destroy_all" 2>/dev/null' EXIT
 patch(){ local id="$1" body="$2" lv; lv=$(curl "${A[@]}" "$U/work_packages/$id" | jq "d['lockVersion']")
   echo "$body" | python3 -c "import sys,json;b=json.load(sys.stdin);b['lockVersion']=$lv;print(json.dumps(b))" \
     | curl "${J[@]}" -X PATCH "$U/work_packages/$id" -d @- -o /dev/null -w "%{http_code}"; }
-mkwp(){ curl "${J[@]}" -X POST "$U/projects/$P/work_packages" -d "{\"subject\":\"$1\",\"_links\":{\"type\":{\"href\":\"/api/v3/types/$T\"},\"version\":{\"href\":\"/api/v3/versions/$2\"}}}" | jq "d['id']"; }
+mkwp(){ python3 -c "import json,sys;print(json.dumps({'subject':sys.argv[1],'_links':{'type':{'href':f'/api/v3/types/{sys.argv[2]}'},'version':{'href':f'/api/v3/versions/{sys.argv[3]}'}}}))" "$1" "$T" "$2" \
+  | curl "${J[@]}" -X POST "$U/projects/$P/work_packages" -d @- | jq "d['id']"; }
 
 echo "== cut a release Version (Rails) =="
 REL=$(RB 'puts Version.create!(project_id:6,name:"SMOKE-v1.0.0",status:"open",description:"release").id' | tr -d '[:space:]')
@@ -47,5 +49,6 @@ CNT=$(echo "$NOTES" | grep -c "SMOKE" || true)
 echo "== cleanup =="
 for id in "${created[@]}"; do curl "${A[@]}" -X DELETE "$U/work_packages/$id" -o /dev/null -w "  del #$id %{http_code}\n"; done
 RB "Version.where(id:[$REL]).destroy_all" >/dev/null && echo "  release version deleted"
+created=(); REL=
 echo "== RESULT: $pass passed, $fail failed =="
 [ "$fail" -eq 0 ]
